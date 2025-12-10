@@ -3,6 +3,31 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { mockService } from '../../services/mockService';
 import { Inquiry, RateDetail } from '../../types';
 
+// ===================== Local UI Components (Replicated for Consistency) =====================
+const Icons = {
+  ArrowLeft: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+  Save: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
+  Clock: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+  User: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  Plus: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
+  Info: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+};
+
+const Card = ({ children, className = "" }: any) => <div className={`bg-white rounded-xl border border-slate-200 shadow-sm ${className}`}>{children}</div>;
+const Button = ({ children, variant = "default", className = "", ...props }: any) => {
+  const variants: any = {
+    default: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
+    secondary: "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50",
+    ghost: "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+  };
+  return <button className={`inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${variants[variant]} ${className}`} {...props}>{children}</button>;
+};
+
+// Grid Input Style for Spreadsheet look (Scaled Up)
+const GridInput = ({ className = "", ...props }: any) => (
+  <input className={`flex h-11 w-full border border-transparent hover:border-slate-300 rounded bg-transparent px-3 py-2 text-base placeholder:text-slate-300 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${className}`} {...props} />
+);
+
 export default function BankInquiryDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -10,10 +35,9 @@ export default function BankInquiryDetail() {
   
   const [inquiry, setInquiry] = useState<Inquiry | null>(null);
   
-  // 模擬身份：從 URL 參數獲取，若無則預設為 "王大明 (Default RM)"
+  // 模擬身份狀態
   const [currentRmName, setCurrentRmName] = useState(searchParams.get('rmName') || '王大明');
 
-  // 本地表單狀態
   const [rateDetails, setRateDetails] = useState<RateDetail[]>([{ tenor: '', rate: '', note: '' }]);
 
   useEffect(() => {
@@ -21,28 +45,22 @@ export default function BankInquiryDetail() {
       const data = mockService.getInquiryById(id);
       if (data) {
         setInquiry(data);
-        
-        // 如果有回覆，檢查邏輯
-        const latestResponse = data.responses[0]; // 假設最新的在第一個
+        const latestResponse = data.responses[0];
         if (latestResponse && latestResponse.rmName === currentRmName) {
-            // 情境二：同一個人回來修改 -> 載入之前的資料
             setRateDetails(latestResponse.details.map(d => ({ ...d })));
         } else {
-            // 情境一 (無回覆) 或 情境三 (不同人) -> 預載入詢價天期，欄位留空
             setRateDetails(data.tenors.map(t => ({ tenor: t, rate: '', note: '' })));
         }
       }
     }
-  }, [id, currentRmName]); // 注意：當 RM 切換時也要重新計算
+  }, [id, currentRmName]);
 
-  if (!inquiry) return <div className="p-10">載入中...</div>;
+  if (!inquiry) return <div className="p-10 text-slate-500 flex justify-center text-lg">載入案件資料中...</div>;
 
-  // 邏輯判斷變數
-  const latestResponse = inquiry.responses[0]; // 取最新一筆
+  const latestResponse = inquiry.responses[0];
   const hasResponse = !!latestResponse;
   const isSameUser = hasResponse && latestResponse.rmName === currentRmName;
 
-  // 處理表單變更
   const updateDetail = (index: number, field: keyof RateDetail, value: string) => {
     const newDetails = [...rateDetails];
     newDetails[index][field] = value;
@@ -50,197 +68,190 @@ export default function BankInquiryDetail() {
   };
   const addRow = () => setRateDetails([...rateDetails, { tenor: '', rate: '', note: '' }]);
 
-  // 送出儲存
   const handleSave = () => {
     mockService.submitResponse(inquiry.id, {
         rmName: currentRmName,
         details: rateDetails
     });
-    alert('回覆已儲存！');
-    // 重新載入資料
+    alert('回覆已成功儲存！');
     const updated = mockService.getInquiryById(inquiry.id);
     if (updated) setInquiry({...updated});
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen pb-10">
-        {/* 頂部身份模擬工具列 (Prototype Only) */}
-        <div className="bg-emerald-900 text-white px-8 py-2 text-sm flex justify-between items-center">
-            <span>正在檢視案件：{inquiry.id}</span>
-            <div className="flex items-center gap-2">
-                <span>模擬 RM 身份：</span>
+    <div className="bg-slate-50 min-h-screen pb-16 font-sans text-slate-900">
+        {/* Unified Sticky Header */}
+        <div className="sticky top-0 z-30 w-full bg-white border-b border-slate-200 px-6 py-5 shadow-sm flex justify-between items-center">
+            <div className="flex items-center gap-5">
+                <Button variant="secondary" onClick={() => navigate('/bank/dashboard')} className="px-4">
+                    <Icons.ArrowLeft className="mr-2 size-5" /> 返回列表
+                </Button>
+                <div className="hidden md:block w-px h-8 bg-slate-200"></div>
+                <div className="hidden md:flex flex-col">
+                    <div className="text-sm font-semibold text-slate-500 mb-0.5">銀行端詢價管理平台 / 回覆詢價案件</div>
+                    <span className="text-lg font-bold text-slate-800">{inquiry.subject}</span>
+                </div>
+            </div>
+            
+            <div className="flex items-center gap-3 bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                <div className="px-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Prototype: RM Identity</div>
                 <select 
                     value={currentRmName} 
                     onChange={(e) => setCurrentRmName(e.target.value)}
-                    className="bg-emerald-800 border border-emerald-600 rounded px-2 py-1 text-white"
+                    className="bg-white border border-slate-200 rounded text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    <option value="王大明">王大明 (原始)</option>
-                    <option value="林小美">林小美 (代理人)</option>
-                    <option value="陳經理">陳經理 (主管)</option>
+                    <option value="王大明">王大明 (Me)</option>
+                    <option value="林小美">林小美 (Colleague)</option>
                 </select>
             </div>
         </div>
 
-        <div className="max-w-5xl mx-auto mt-8 px-4">
-            <button onClick={() => navigate('/bank/dashboard')} className="text-gray-500 hover:text-gray-700 mb-4">
-                &larr; 返回案件列表
-            </button>
+        <div className="max-w-6xl mx-auto mt-10 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Left Column: Inquiry Info (1/3) */}
+            <div className="md:col-span-1 space-y-8">
+                <Card className="p-0 overflow-hidden">
+                    <div className="bg-slate-50 border-b p-5">
+                        <h2 className="font-semibold text-slate-800 text-lg">案件資訊</h2>
+                    </div>
+                    <div className="p-5 space-y-5 text-base">
+                        <div>
+                            <div className="text-slate-500 text-sm mb-1.5">企業名稱</div>
+                            <div className="font-medium text-slate-900 text-lg">{inquiry.companyName}</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-5">
+                             <div>
+                                <div className="text-slate-500 text-sm mb-1.5">幣別</div>
+                                <div className="font-mono font-medium text-lg">{inquiry.currency}</div>
+                            </div>
+                            <div>
+                                <div className="text-slate-500 text-sm mb-1.5">金額</div>
+                                <div className="font-mono font-medium text-lg">{inquiry.amount.toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-5">
+                             <div>
+                                <div className="text-slate-500 text-sm mb-1.5">起息日</div>
+                                <div>{inquiry.startDate}</div>
+                            </div>
+                            <div>
+                                <div className="text-slate-500 text-sm mb-1.5">到期日</div>
+                                <div>{inquiry.endDate}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="text-slate-500 text-sm mb-1.5">用途</div>
+                            <div className="text-slate-700 leading-relaxed">{inquiry.purpose}</div>
+                        </div>
+                    </div>
+                </Card>
 
-            {/* 1. 案件基本資訊區 (唯讀) */}
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                <div className="flex justify-between items-start border-b pb-4 mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">{inquiry.subject}</h1>
-                        <p className="text-lg text-emerald-700 font-medium mt-1">{inquiry.companyName}</p>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-sm text-gray-500">詢價日期</div>
-                        <div className="font-mono">{inquiry.createDate}</div>
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-                    <div>
-                        <div className="text-gray-500">幣別</div>
-                        <div className="font-bold text-lg">{inquiry.currency}</div>
-                    </div>
-                    <div>
-                        <div className="text-gray-500">金額</div>
-                        <div className="font-bold text-lg">{inquiry.amount.toLocaleString()}</div>
-                    </div>
-                    <div>
-                        <div className="text-gray-500">起息日</div>
-                        <div>{inquiry.startDate}</div>
-                    </div>
-                    <div>
-                        <div className="text-gray-500">到期日</div>
-                        <div>{inquiry.endDate}</div>
-                    </div>
-                    <div className="col-span-4">
-                        <div className="text-gray-500">詢價用途</div>
-                        <div>{inquiry.purpose}</div>
-                    </div>
-                </div>
+                {/* History Timeline */}
+                {inquiry.responses.length > 0 && (
+                    <Card className="p-5">
+                         <div className="text-base font-semibold text-slate-800 mb-5 flex items-center gap-2">
+                            <Icons.Clock className="size-5 text-slate-400" />
+                            歷史回覆紀錄
+                         </div>
+                         <div className="relative pl-5 border-l-2 border-slate-100 space-y-8">
+                            {inquiry.responses.map(resp => (
+                                <div key={resp.id} className="relative">
+                                    <div className="absolute -left-[22px] top-1.5 size-3.5 rounded-full bg-slate-200 border-2 border-white"></div>
+                                    <div className="text-sm text-slate-500 mb-2 flex justify-between">
+                                        <span>{resp.updatedAt}</span>
+                                        <span className="font-medium text-slate-700">{resp.rmName}</span>
+                                    </div>
+                                    <div className="bg-slate-50 rounded-lg p-3 text-sm border border-slate-100 space-y-1.5">
+                                         {resp.details.map((d, i) => (
+                                            <div key={i} className="flex justify-between">
+                                                <span>{d.tenor}</span>
+                                                <span className="font-mono font-bold text-slate-700 text-base">{d.rate}</span>
+                                            </div>
+                                         ))}
+                                    </div>
+                                </div>
+                            ))}
+                         </div>
+                    </Card>
+                )}
             </div>
 
-            {/* 2. 本行回覆區 (核心邏輯) */}
-            <div className="bg-white rounded-lg shadow-lg border-t-4 border-emerald-600 p-6 mb-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">本行回覆資訊</h2>
-                
-                {/* 提示文字 */}
-                {hasResponse ? (
-                    <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm mb-4 border border-blue-200">
-                        目前顯示為 <strong>{latestResponse.rmName}</strong> 於 {latestResponse.updatedAt} 填寫的最新回覆
+            {/* Right Column: Response Form (2/3) */}
+            <div className="md:col-span-2">
+                <Card className="p-8 border-t-4 border-t-blue-600 shadow-md">
+                    <div className="flex justify-between items-start mb-8">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-900">本行報價回覆</h2>
+                            <p className="text-base text-slate-500 mt-1">請填寫各天期利率與備註</p>
+                        </div>
+                        <div className="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium border border-blue-100">
+                            {hasResponse ? (isSameUser ? '編輯我的回覆' : '新增回覆') : '首次回覆'}
+                        </div>
                     </div>
-                ) : (
-                    <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded text-sm mb-4">
-                        目前尚無回覆，請填寫報價資訊。
-                    </div>
-                )}
 
-                {/* 情境三：不同人 -> 顯示唯讀的最新回覆 */}
-                {hasResponse && !isSameUser && (
-                    <div className="mb-8 opacity-75 pointer-events-none bg-gray-50 p-4 rounded border border-dashed border-gray-300">
-                        <div className="text-xs text-gray-400 mb-2 font-bold uppercase tracking-wider">唯讀參考：前次同事回覆</div>
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="text-gray-500 border-b">
-                                    <th className="text-left pb-2">天期</th>
-                                    <th className="text-left pb-2">利率</th>
-                                    <th className="text-left pb-2">備註</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {latestResponse.details.map((d, i) => (
-                                    <tr key={i}>
-                                        <td className="py-2">{d.tenor}</td>
-                                        <td className="py-2 font-bold">{d.rate}</td>
-                                        <td className="py-2">{d.note}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                    {/* Alert for Read-Only Context */}
+                    {hasResponse && !isSameUser && (
+                        <div className="mb-8 bg-slate-50 border border-slate-200 rounded-lg p-5 flex gap-4">
+                            <Icons.Info className="size-6 text-slate-400 shrink-0 mt-0.5" />
+                            <div className="text-base text-slate-600">
+                                <span className="font-semibold text-slate-800 block mb-1">最新回覆資訊</span>
+                                目前顯示為 <span className="font-medium text-slate-900">{latestResponse.rmName}</span> 於 {latestResponse.updatedAt} 填寫的內容。您正在以 <strong>{currentRmName}</strong> 身份建立新的回覆。
+                            </div>
+                        </div>
+                    )}
 
-                {/* 編輯/新增區塊 */}
-                <div>
-                    <h3 className="font-bold text-gray-700 mb-3">
-                        {hasResponse && !isSameUser ? '您要新增的回覆：' : '編輯回覆內容：'}
-                    </h3>
-                    
-                    <div className="space-y-3">
+                    {/* Edit Grid (Spreadsheet Style) */}
+                    <div className="border border-slate-200 rounded-lg overflow-hidden">
+                        {/* Header */}
+                        <div className="grid grid-cols-10 gap-0 bg-slate-50 border-b border-slate-200 text-sm font-medium text-slate-500">
+                            <div className="col-span-3 px-4 py-3 border-r border-slate-200">天期</div>
+                            <div className="col-span-3 px-4 py-3 border-r border-slate-200">利率 (%)</div>
+                            <div className="col-span-4 px-4 py-3">備註</div>
+                        </div>
+                        
+                        {/* Rows */}
+                        <div className="bg-slate-50/30 divide-y divide-slate-100">
                         {rateDetails.map((item, idx) => (
-                            <div key={idx} className="flex gap-3 items-start">
-                                <div className="w-1/4">
-                                    <input 
-                                        type="text" 
+                            <div key={idx} className="grid grid-cols-10 gap-0 items-center group hover:bg-white transition-colors">
+                                <div className="col-span-3 px-1 py-1 border-r border-slate-100">
+                                    <GridInput 
                                         value={item.tenor} 
-                                        onChange={(e) => updateDetail(idx, 'tenor', e.target.value)}
-                                        placeholder="天期" 
-                                        className="w-full border rounded p-2 text-sm"
+                                        onChange={(e: any) => updateDetail(idx, 'tenor', e.target.value)}
+                                        placeholder="如: 30天"
                                     />
                                 </div>
-                                <div className="w-1/4">
-                                    <input 
-                                        type="text" 
+                                <div className="col-span-3 px-1 py-1 border-r border-slate-100">
+                                    <GridInput 
                                         value={item.rate} 
-                                        onChange={(e) => updateDetail(idx, 'rate', e.target.value)}
-                                        placeholder="利率 %" 
-                                        className="w-full border rounded p-2 text-sm font-bold text-emerald-700"
+                                        onChange={(e: any) => updateDetail(idx, 'rate', e.target.value)}
+                                        className="font-mono font-bold text-blue-700 text-lg"
+                                        placeholder="-"
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <input 
-                                        type="text" 
+                                <div className="col-span-4 px-1 py-1">
+                                    <GridInput 
                                         value={item.note || ''} 
-                                        onChange={(e) => updateDetail(idx, 'note', e.target.value)}
-                                        placeholder="備註 (選填)" 
-                                        className="w-full border rounded p-2 text-sm"
+                                        onChange={(e: any) => updateDetail(idx, 'note', e.target.value)}
+                                        placeholder="選填"
+                                        className="text-slate-500"
                                     />
                                 </div>
                             </div>
                         ))}
+                        </div>
                     </div>
-                    <button onClick={addRow} className="text-sm text-emerald-600 hover:underline mt-2">+ 新增一列</button>
-                    
-                    <div className="mt-6 flex justify-end">
-                        <button 
-                            onClick={handleSave}
-                            className="bg-emerald-600 text-white px-8 py-2 rounded shadow hover:bg-emerald-700 transition font-medium"
-                        >
-                            儲存回覆
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            {/* 3. 歷史回覆紀錄區 (展開/收合) */}
-            {inquiry.responses.length > 0 && (
-                <details className="bg-white rounded-lg shadow-sm border p-4">
-                    <summary className="cursor-pointer font-bold text-gray-700 hover:text-emerald-600">
-                        檢視歷史回覆紀錄 ({inquiry.responses.length})
-                    </summary>
-                    <div className="mt-4 space-y-4 pl-4 border-l-2 border-gray-200">
-                        {inquiry.responses.map(resp => (
-                            <div key={resp.id} className="text-sm">
-                                <div className="flex gap-2 text-gray-500 mb-1">
-                                    <span className="font-bold text-gray-700">{resp.rmName}</span>
-                                    <span>於 {resp.updatedAt}</span>
-                                </div>
-                                <div className="bg-gray-50 p-2 rounded">
-                                    {resp.details.map((d, i) => (
-                                        <div key={i} className="flex gap-2">
-                                            <span className="w-16">{d.tenor}</span>
-                                            <span className="font-bold">{d.rate}</span>
-                                            <span className="text-gray-400">{d.note}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
+                    <div className="mt-6 flex justify-between items-center">
+                        <button onClick={addRow} className="text-base text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2 hover:bg-blue-50 px-3 py-2 rounded transition">
+                            <Icons.Plus className="size-5" /> 新增一列
+                        </button>
+                        <Button onClick={handleSave} className="pl-4 pr-6 shadow-lg shadow-blue-200 text-base py-3">
+                            <Icons.Save className="mr-2 size-5" /> 
+                            {hasResponse && isSameUser ? '更新回覆' : '送出報價'}
+                        </Button>
                     </div>
-                </details>
-            )}
+                </Card>
+            </div>
         </div>
     </div>
   );

@@ -17,30 +17,32 @@ const Icons = {
   ChevronDown: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>,
 };
 
-// ===================== Mock UI Components (Replaces shadcn/ui) =====================
+// ===================== Mock UI Components (Scale Up) =====================
 const Card = ({ children, className = "" }: any) => <div className={`bg-white rounded-xl border border-slate-200 ${className}`}>{children}</div>;
 const CardHeader = ({ children, className = "" }: any) => <div className={`p-6 ${className}`}>{children}</div>;
-const CardTitle = ({ children, className = "" }: any) => <h3 className={`font-semibold text-slate-900 ${className}`}>{children}</h3>;
+const CardTitle = ({ children, className = "" }: any) => <h3 className={`text-lg md:text-xl font-semibold text-slate-900 ${className}`}>{children}</h3>;
 const CardContent = ({ children, className = "" }: any) => <div className={`p-6 pt-0 ${className}`}>{children}</div>;
 
+// Action 1: Updated Button Styles (Blue Focus Ring, Larger Size)
 const Button = ({ children, variant = "default", size = "default", className = "", ...props }: any) => {
-  const baseStyle = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:opacity-50 disabled:pointer-events-none";
+  const baseStyle = "inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none";
   const variants: any = {
-    default: "bg-slate-900 text-white hover:bg-slate-800",
-    outline: "border border-slate-200 hover:bg-slate-100 text-slate-900",
+    default: "bg-slate-900 text-white hover:bg-slate-800 shadow-sm hover:shadow",
+    outline: "border border-slate-200 hover:bg-slate-50 text-slate-900 bg-white",
     ghost: "hover:bg-slate-100 text-slate-700",
     secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200"
   };
   const sizes: any = {
-    default: "h-10 py-2 px-4",
-    sm: "h-9 px-3",
-    icon: "h-10 w-10"
+    default: "h-11 py-2 px-5 text-base", // Scaled up
+    sm: "h-9 px-3 text-sm",
+    icon: "h-11 w-11"
   };
   return <button className={`${baseStyle} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>{children}</button>;
 };
 
+// Action 1: Updated Input Styles (Blue Focus Ring, Larger Text)
 const Input = ({ className = "", ...props }: any) => (
-  <input className={`flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus:visible:outline-none focus:visible:ring-2 focus:visible:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 ${className}`} {...props} />
+  <input className={`flex h-11 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus:visible:outline-none focus:visible:ring-2 focus:visible:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 ${className}`} {...props} />
 );
 
 const Badge = ({ children, variant = "default", className = "" }: any) => {
@@ -52,7 +54,7 @@ const Badge = ({ children, variant = "default", className = "" }: any) => {
   return <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 ${variants[variant]} ${className}`}>{children}</div>;
 };
 
-const Label = ({ children, htmlFor, className = "" }: any) => <label htmlFor={htmlFor} className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}>{children}</label>;
+const Label = ({ children, htmlFor, className = "" }: any) => <label htmlFor={htmlFor} className={`text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}>{children}</label>;
 
 const Switch = ({ checked, onCheckedChange, id }: any) => (
   <button
@@ -60,16 +62,15 @@ const Switch = ({ checked, onCheckedChange, id }: any) => (
     role="switch"
     aria-checked={checked}
     onClick={() => onCheckedChange(!checked)}
-    className={`peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${checked ? 'bg-slate-900' : 'bg-slate-200'}`}
+    className={`peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${checked ? 'bg-slate-900' : 'bg-slate-200'}`}
   >
     <span className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
   </button>
 );
 
-// Simple CSS Bar Chart to replace Recharts
 const SimpleBarChart = ({ data }: { data: { name: string; rate: number }[] }) => {
     if (!data.length) return <div className="h-full flex items-center justify-center text-gray-400">無數據</div>;
-    const maxRate = Math.max(...data.map(d => d.rate)) * 1.1; // Add some headroom
+    const maxRate = Math.max(...data.map(d => d.rate)) * 1.1; 
     return (
         <div className="h-full w-full flex items-end justify-around gap-2 px-4 pb-6 pt-4">
             {data.map((d, i) => (
@@ -79,7 +80,7 @@ const SimpleBarChart = ({ data }: { data: { name: string; rate: number }[] }) =>
                             {d.rate}%
                         </div>
                     </div>
-                    <div className="mt-2 text-xs text-slate-500 font-medium truncate w-full text-center" title={d.name}>{d.name}</div>
+                    <div className="mt-2 text-sm text-slate-500 font-medium truncate w-full text-center" title={d.name}>{d.name}</div>
                 </div>
             ))}
         </div>
@@ -221,13 +222,13 @@ const comma = (n: number) => n.toLocaleString();
 function statusIcon(label: string) {
   switch (label) {
     case "已回覆":
-      return <Icons.CheckCircle2 className="inline-block size-4 text-emerald-600" aria-hidden />;
+      return <Icons.CheckCircle2 className="inline-block size-5 text-emerald-600" aria-hidden />;
     case "待回覆":
-      return <Icons.Clock3 className="inline-block size-4 text-amber-500" aria-hidden />;
+      return <Icons.Clock3 className="inline-block size-5 text-amber-500" aria-hidden />;
     case "已開信":
-      return <Icons.MailOpen className="inline-block size-4 text-blue-500" aria-hidden />;
+      return <Icons.MailOpen className="inline-block size-5 text-blue-500" aria-hidden />;
     default:
-      return <Icons.Mail className="inline-block size-4 text-slate-400" aria-hidden />;
+      return <Icons.Mail className="inline-block size-5 text-slate-400" aria-hidden />;
   }
 }
 
@@ -244,7 +245,6 @@ export default function CorporateDashboard() {
   // Modal State
   const [activeModalRow, setActiveModalRow] = useState<BankRow | null>(null);
 
-  // 導航與建立新詢價
   const handleNewInquiry = () => {
     window.location.hash = "/corporate/create";
   };
@@ -303,71 +303,71 @@ export default function CorporateDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      {/* Header */}
-      <div className="border-b px-6 py-4 flex items-center justify-between bg-white shadow-sm sticky top-0 z-10">
+      {/* Unified Sticky Header */}
+      <div className="sticky top-0 z-30 w-full bg-white border-b border-slate-200 px-6 py-5 shadow-sm flex items-center justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold text-slate-800 flex items-center gap-2">
-            🏢 多銀行詢價通知與回覆管理 Dashboard
+          <div className="text-sm font-semibold text-slate-500 mb-1">企業端本地詢價工具</div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+            詢價案件列表
           </h1>
-          <p className="text-xs md:text-sm text-slate-500 mt-1">以「詢價」為中心，查詢、追蹤回覆與整理報價。</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div className="hidden md:block relative">
              <select 
-                className="appearance-none bg-white border border-slate-300 hover:border-slate-400 text-slate-700 py-2 pl-3 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-slate-500 text-sm"
+                className="appearance-none bg-white border border-slate-300 hover:border-slate-400 text-slate-700 h-11 pl-4 pr-10 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-slate-500 text-base"
                 value={sortBy}
                 onChange={(e: any) => setSortBy(e.target.value)}
              >
                 <option value="createdAt">依建立時間排序</option>
                 <option value="completion">依回覆完成度排序</option>
              </select>
-             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700">
+             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-700">
                 <Icons.ArrowUpDown className="h-4 w-4" />
              </div>
           </div>
-          <Button className="rounded-2xl shadow-sm" variant="default" onClick={handleNewInquiry}>
-            <Icons.Plus className="mr-2 size-4" />新建詢價
+          <Button className="rounded-2xl shadow-sm text-base" variant="default" onClick={handleNewInquiry}>
+            <Icons.Plus className="mr-2 size-5" />新建詢價
           </Button>
         </div>
       </div>
 
       {/* Main two-column layout */}
-      <div className="grid grid-cols-12 gap-4 p-4 max-w-[1600px] mx-auto">
+      <div className="grid grid-cols-12 gap-6 p-6 max-w-[1600px] mx-auto">
         {/* Left: Inquiry list (25%) */}
         <div className="col-span-12 md:col-span-3">
-          <Card className="shadow-sm h-[calc(100vh-140px)] flex flex-col">
-            <CardHeader className="pb-2 flex-none">
-              <CardTitle className="text-base">詢價清單</CardTitle>
-              <div className="relative mt-2">
-                <Icons.Search className="absolute left-3 top-2.5 size-4 text-slate-400" />
+          <Card className="shadow-sm h-[calc(100vh-160px)] flex flex-col">
+            <CardHeader className="pb-4 flex-none">
+              <CardTitle className="text-lg">詢價清單</CardTitle>
+              <div className="relative mt-3">
+                <Icons.Search className="absolute left-3 top-3.5 size-5 text-slate-400" />
                 <Input
-                  className="pl-9"
+                  className="pl-10"
                   placeholder="搜尋主旨 / 日期 / 幣別"
                   value={query}
                   onChange={(e: any) => setQuery(e.target.value)}
                 />
               </div>
             </CardHeader>
-            <CardContent className="pt-2 space-y-2 flex-1 overflow-y-auto">
+            <CardContent className="pt-2 space-y-3 flex-1 overflow-y-auto">
               {filtered.map((i) => (
                 <button
                   key={i.id}
                   onClick={() => setSelectedId(i.id)}
-                  className={`w-full text-left border rounded-xl p-3 transition-all duration-200 hover:shadow-md ${
-                    selectedId === i.id ? "border-slate-800 bg-slate-50 ring-1 ring-slate-800" : "border-slate-200 bg-white hover:border-slate-300"
+                  className={`w-full text-left border rounded-xl p-4 transition-all duration-200 hover:shadow-md ${
+                    selectedId === i.id ? "border-l-4 border-l-blue-600 border-y border-r border-slate-200 bg-slate-50" : "border border-slate-200 bg-white hover:border-blue-300"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="font-medium text-slate-800 line-clamp-1 text-sm">{i.title}</div>
-                    <Icons.ChevronRight className="size-4 shrink-0 text-slate-400" />
+                    <div className={`font-medium line-clamp-1 text-base ${selectedId === i.id ? "text-blue-700" : "text-slate-800"}`}>{i.title}</div>
+                    <Icons.ChevronRight className={`size-5 shrink-0 ${selectedId === i.id ? "text-blue-500" : "text-slate-400"}`} />
                   </div>
-                  <div className="mt-1 text-xs text-slate-500">
+                  <div className="mt-1 text-sm text-slate-500">
                     {fmtDateTime(i.createdAt).split(' ')[0]}
                   </div>
-                  <div className="mt-2 flex items-center gap-2 text-xs flex-wrap">
-                    <Badge variant="secondary" className="text-[10px] px-1.5 bg-slate-100">已寄 {i.sentCount}</Badge>
-                    <Badge variant="secondary" className="text-[10px] px-1.5 bg-slate-100">已開 {i.openedCount}</Badge>
-                    <Badge variant={i.repliedCount > 0 ? "default" : "secondary"} className={`text-[10px] px-1.5 ${i.repliedCount > 0 ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}>
+                  <div className="mt-3 flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-slate-100">已寄 {i.sentCount}</Badge>
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-slate-100">已開 {i.openedCount}</Badge>
+                    <Badge variant={i.repliedCount > 0 ? "default" : "secondary"} className={`text-xs px-2 py-1 ${i.repliedCount > 0 ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}>
                         已回 {i.repliedCount}
                     </Badge>
                   </div>
@@ -376,7 +376,7 @@ export default function CorporateDashboard() {
 
               {/* Load more */}
               {limit < MOCK_INQUIRIES.length && (
-                <Button variant="outline" className="w-full mt-1 border-dashed" onClick={() => setLimit((x) => x + 5)}>
+                <Button variant="outline" className="w-full mt-2 border-dashed" onClick={() => setLimit((x) => x + 5)}>
                   載入更多
                 </Button>
               )}
@@ -385,17 +385,17 @@ export default function CorporateDashboard() {
         </div>
 
         {/* Right: Detail (75%) */}
-        <div className="col-span-12 md:col-span-9 flex flex-col gap-4 h-[calc(100vh-140px)] overflow-y-auto pr-1">
+        <div className="col-span-12 md:col-span-9 flex flex-col gap-6 h-[calc(100vh-160px)] overflow-y-auto pr-1">
           {/* (1) 概要 */}
           <Card className="shadow-sm flex-none">
-            <CardHeader className="pb-2 py-4">
-              <CardTitle className="text-base flex items-center gap-2">
+            <CardHeader className="pb-4 pt-6">
+              <CardTitle className="flex items-center gap-3 text-xl">
                  <span>詢價概要</span>
-                 <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded-full">{selected?.id}</span>
+                 <span className="text-sm font-normal text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{selected?.id}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <CardContent className="pb-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-base">
                 <Field label="主旨" value={selected?.title} className="col-span-2 md:col-span-1" />
                 <Field label="金額" value={`${selected?.currency} ${comma(selected?.amount || 0)}`} />
                 <Field label="幣別" value={selected?.currency} />
@@ -404,8 +404,8 @@ export default function CorporateDashboard() {
             </CardContent>
           </Card>
 
-          {/* (3) 統計摘要區 - Moved Here */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 flex-none">
+          {/* (3) 統計摘要區 */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 flex-none">
             <StatCard label="總寄送數" value={String(stats.total)} />
             <StatCard label="已開信數" value={String(stats.opened)} />
             <StatCard label="已回覆數" value={String(stats.replied)} highlight />
@@ -415,34 +415,34 @@ export default function CorporateDashboard() {
 
           {/* (2) 銀行寄送與回覆狀態表 */}
           <Card className="shadow-sm flex-1 flex flex-col min-h-[400px]">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between flex-wrap gap-2 py-4">
-              <CardTitle className="text-base">銀行寄送與回覆狀態</CardTitle>
-              <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-2 border rounded-xl px-3 py-1.5 bg-white">
-                  <Icons.Filter className="size-4 text-slate-500" />
+            <CardHeader className="pb-4 flex flex-row items-center justify-between flex-wrap gap-3 py-6">
+              <CardTitle className="text-xl">銀行寄送與回覆狀態</CardTitle>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-3 border rounded-xl px-4 py-2 bg-white">
+                  <Icons.Filter className="size-5 text-slate-500" />
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="f1" className="text-xs whitespace-nowrap cursor-pointer">僅未回覆</Label>
+                    <Label htmlFor="f1" className="text-sm whitespace-nowrap cursor-pointer">僅未回覆</Label>
                     <Switch id="f1" checked={showOnlyUnreplied} onCheckedChange={setShowOnlyUnreplied} />
                   </div>
-                  <div className="w-px h-4 bg-slate-200 mx-1"></div>
+                  <div className="w-px h-5 bg-slate-200 mx-2"></div>
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="f2" className="text-xs whitespace-nowrap cursor-pointer">僅最高利率</Label>
+                    <Label htmlFor="f2" className="text-sm whitespace-nowrap cursor-pointer">僅最高利率</Label>
                     <Switch id="f2" checked={showOnlyTopRate} onCheckedChange={setShowOnlyTopRate} />
                   </div>
                 </div>
 
-                <div className="flex bg-slate-100 p-1 rounded-lg">
+                <div className="flex bg-slate-100 p-1.5 rounded-lg">
                     <button 
                         onClick={() => setViewMode("table")}
-                        className={`flex items-center px-3 py-1 text-xs rounded-md transition-all ${viewMode === 'table' ? 'bg-white shadow text-slate-900 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`flex items-center px-4 py-1.5 text-sm rounded-md transition-all ${viewMode === 'table' ? 'bg-white shadow text-slate-900 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        <Icons.Table className="mr-1 size-3" />表格
+                        <Icons.Table className="mr-2 size-4" />表格
                     </button>
                     <button 
                         onClick={() => setViewMode("chart")}
-                        className={`flex items-center px-3 py-1 text-xs rounded-md transition-all ${viewMode === 'chart' ? 'bg-white shadow text-slate-900 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`flex items-center px-4 py-1.5 text-sm rounded-md transition-all ${viewMode === 'chart' ? 'bg-white shadow text-slate-900 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        <Icons.BarChart3 className="mr-1 size-3" />圖表
+                        <Icons.BarChart3 className="mr-2 size-4" />圖表
                     </button>
                 </div>
               </div>
@@ -451,50 +451,50 @@ export default function CorporateDashboard() {
               {viewMode === "table" ? (
                 <div className="rounded-xl border overflow-hidden flex-1 relative">
                   <div className="absolute inset-0 overflow-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0 z-10">
+                    <table className="w-full text-left">
+                      <thead className="text-sm text-slate-500 uppercase bg-slate-50 sticky top-0 z-10">
                         <tr>
-                          <th className="px-4 py-3 font-medium">銀行名稱</th>
-                          <th className="px-4 py-3 font-medium">寄送狀態</th>
-                          <th className="px-4 py-3 font-medium">開信狀態</th>
-                          <th className="px-4 py-3 font-medium">回覆狀態</th>
-                          <th className="px-4 py-3 font-medium text-right">利率(%)</th>
-                          <th className="px-4 py-3 font-medium">回覆時間</th>
-                          <th className="px-4 py-3 font-medium">方式</th>
-                          <th className="px-4 py-3 font-medium">操作</th>
+                          <th className="px-5 py-4 font-medium">銀行名稱</th>
+                          <th className="px-5 py-4 font-medium">寄送狀態</th>
+                          <th className="px-5 py-4 font-medium">開信狀態</th>
+                          <th className="px-5 py-4 font-medium">回覆狀態</th>
+                          <th className="px-5 py-4 font-medium text-right">利率(%)</th>
+                          <th className="px-5 py-4 font-medium">回覆時間</th>
+                          <th className="px-5 py-4 font-medium">方式</th>
+                          <th className="px-5 py-4 font-medium">操作</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 text-base">
                         {rowsForView.map((r, idx) => (
-                          <tr key={idx} className="bg-white hover:bg-slate-50 transition-colors">
-                            <td className="px-4 py-3 font-medium text-slate-800">{r.bank}</td>
-                            <td className="px-4 py-3 text-slate-500">{r.sendStatus}</td>
-                            <td className="px-4 py-3">
-                              <span className="inline-flex items-center gap-1.5 text-slate-600">
+                          <tr key={idx} className="bg-white hover:bg-slate-50 transition-colors group">
+                            <td className="px-5 py-4 font-medium text-slate-800">{r.bank}</td>
+                            <td className="px-5 py-4 text-slate-500 text-sm">{r.sendStatus}</td>
+                            <td className="px-5 py-4">
+                              <span className="inline-flex items-center gap-2 text-slate-600">
                                 {statusIcon(r.openStatus)} {r.openStatus}
                               </span>
                             </td>
-                            <td className="px-4 py-3">
-                              <span className="inline-flex items-center gap-1.5 text-slate-600">
+                            <td className="px-5 py-4">
+                              <span className="inline-flex items-center gap-2 text-slate-600">
                                 {statusIcon(r.replyStatus)} {r.replyStatus}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right font-bold text-slate-700">
-                                {typeof r.rate === "number" ? <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{r.rate.toFixed(2)}</span> : <span className="text-slate-300">—</span>}
+                            <td className="px-5 py-4 text-right font-bold text-slate-700">
+                                {typeof r.rate === "number" ? <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded text-base">{r.rate.toFixed(2)}</span> : <span className="text-slate-300">—</span>}
                             </td>
-                            <td className="px-4 py-3 text-slate-500 text-xs">{fmtDateTime(r.repliedAt)}</td>
-                            <td className="px-4 py-3 text-slate-500 text-xs">{r.via || "—"}</td>
-                            <td className="px-4 py-3">
+                            <td className="px-5 py-4 text-slate-500 text-sm">{fmtDateTime(r.repliedAt)}</td>
+                            <td className="px-5 py-4 text-slate-500 text-sm">{r.via || "—"}</td>
+                            <td className="px-5 py-4">
                                 {r.replyStatus === "已回覆" && (
-                                    <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setActiveModalRow(r)}>
-                                        查看
+                                    <Button variant="ghost" size="sm" className="h-8 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50" onClick={() => setActiveModalRow(r)}>
+                                        查看詳情
                                     </Button>
                                 )}
                             </td>
                           </tr>
                         ))}
                         {rowsForView.length === 0 && (
-                            <tr><td colSpan={8} className="text-center py-8 text-slate-400">無符合條件的資料</td></tr>
+                            <tr><td colSpan={8} className="text-center py-10 text-slate-400">無符合條件的資料</td></tr>
                         )}
                       </tbody>
                     </table>
@@ -507,9 +507,9 @@ export default function CorporateDashboard() {
               )}
 
               {/* 匯出報表 */}
-              <div className="mt-4 flex justify-end">
-                <Button variant="outline" className="rounded-2xl text-xs h-8">
-                  <Icons.Download className="mr-2 size-3" /> 匯出比較報表（Excel / PDF）
+              <div className="mt-6 flex justify-end">
+                <Button variant="outline" className="rounded-2xl text-sm h-10 px-4">
+                  <Icons.Download className="mr-2 size-4" /> 匯出比較報表（Excel / PDF）
                 </Button>
               </div>
             </CardContent>
@@ -521,23 +521,23 @@ export default function CorporateDashboard() {
       {activeModalRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-                <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
-                    <h3 className="font-semibold text-lg">{activeModalRow.bank} 回覆詳細內容</h3>
-                    <button onClick={() => setActiveModalRow(null)} className="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+                <div className="px-8 py-5 border-b flex justify-between items-center bg-slate-50">
+                    <h3 className="font-semibold text-xl">{activeModalRow.bank} 回覆詳細內容</h3>
+                    <button onClick={() => setActiveModalRow(null)} className="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
                 </div>
-                <div className="p-6">
-                    <div className="mb-4">
-                        <div className="text-xs text-slate-500 mb-1">利率報價</div>
-                        <div className="text-3xl font-bold text-slate-800">{activeModalRow.rate}%</div>
+                <div className="p-8">
+                    <div className="mb-6">
+                        <div className="text-sm text-slate-500 mb-2">利率報價</div>
+                        <div className="text-4xl font-bold text-slate-800">{activeModalRow.rate}%</div>
                     </div>
-                    <div className="bg-slate-50 p-4 rounded-xl border text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
+                    <div className="bg-slate-50 p-5 rounded-xl border text-base text-slate-700 whitespace-pre-wrap leading-relaxed">
                         {activeModalRow.replyBody || activeModalRow.remark || "（無詳細文字內容）"}
                     </div>
-                    <div className="mt-4 text-xs text-slate-400 text-right">
+                    <div className="mt-5 text-sm text-slate-400 text-right">
                         回覆時間：{fmtDateTime(activeModalRow.repliedAt)} (透過 {activeModalRow.via})
                     </div>
                 </div>
-                <div className="bg-slate-50 px-6 py-3 flex justify-end">
+                <div className="bg-slate-50 px-8 py-4 flex justify-end">
                     <Button variant="default" onClick={() => setActiveModalRow(null)}>關閉</Button>
                 </div>
             </div>
@@ -549,9 +549,9 @@ export default function CorporateDashboard() {
 
 function Field({ label, value, className = "" }: { label: string; value?: React.ReactNode, className?: string }) {
   return (
-    <div className={`rounded-xl border border-slate-100 bg-slate-50/50 p-3 ${className}`}>
-      <div className="text-xs text-slate-500 mb-1">{label}</div>
-      <div className="font-medium text-slate-800">{value ?? "—"}</div>
+    <div className={`rounded-xl border border-slate-100 bg-slate-50/50 p-4 ${className}`}>
+      <div className="text-sm text-slate-500 mb-1">{label}</div>
+      <div className="font-medium text-slate-800 text-lg">{value ?? "—"}</div>
     </div>
   );
 }
@@ -559,13 +559,13 @@ function Field({ label, value, className = "" }: { label: string; value?: React.
 function StatCard({ label, value, sub, highlight, suffix }: { label: string; value: string; sub?: string, highlight?: boolean, suffix?: string }) {
   return (
     <Card className={`shadow-sm border-slate-200 ${highlight ? 'border-b-4 border-b-emerald-500' : ''}`}>
-      <CardContent className="p-4 flex flex-col justify-center h-full">
-        <div className="text-xs text-slate-500">{label}</div>
-        <div className="text-xl font-semibold mt-1 text-slate-800 flex items-baseline gap-1">
+      <CardContent className="p-5 flex flex-col justify-center h-full">
+        <div className="text-sm text-slate-500">{label}</div>
+        <div className="text-2xl md:text-3xl font-semibold mt-2 text-slate-800 flex items-baseline gap-1">
             {value}
-            {suffix && <span className="text-sm font-normal text-slate-400">{suffix}</span>}
+            {suffix && <span className="text-lg font-normal text-slate-400">{suffix}</span>}
         </div>
-        {sub && <div className="text-xs text-slate-500 mt-1">{sub}</div>}
+        {sub && <div className="text-sm text-slate-500 mt-1">{sub}</div>}
       </CardContent>
     </Card>
   );
